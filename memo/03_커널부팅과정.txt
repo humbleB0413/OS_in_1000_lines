@@ -1,0 +1,12 @@
+- SBI(Supervisor Binary Interface)
+    OS 커널을 위한 API이며, 동시에 펌웨어(OpenSBI)가 OS에 제공하는 기능을 정의한 것
+    SBI 명세는 Github에 정의되어 있음.
+    SBI 구현제 중 가장 널리 사용되는 명세는 OpenSBI
+
+C-a h    도움말 표시
+C-a x    에뮬레이터 종료
+C-a s    디스크 데이터를 파일에 저장(-snapshot 사용 시)
+C-a t    콘솔 타임스탬프 토글
+C-a b    break(매직 sysrq)
+C-a c    콘솔과 모니터 간 전환
+C-a C-a  C-a를 전송

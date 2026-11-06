@@ -1,0 +1,63 @@
+RISC-V 어셈블리 입문
+
+- 어셈블리 언어는 기계와 거의 1:1에 대응되는 표현
+    ex) addi a0, a1, 123 <-> a0 = a1 + 123;
+- Register: CPU 내부의 임시 변수, 메모리보다 훨씬 빠른 데이터 저장 공간
+    ABI : Description
+    pc: 프로그램 카운터(다음 실행할 명령어 주소 저장)
+    zero: 항상 0인 레지스터
+    ra: 함수 호출에서 복귀 주소 저장
+    sp: 스택 포인터
+    t0 - t2: 임시용 레지스터
+    a0 - a1: 함수 인자 및 반환 값
+    a2 - a7: 함수 인자
+    s0 - s11: 함수 호출사이에도 값이 보존되는 레지스터
+    t3 - t6: 임시용 레지스터
+- 메모리 접근
+    메모리 값 읽기: lw a0, (a1) <-> *a0 = a1;
+    메모리에 값 저장: sw a0, (a1) <-> *a1 = a0;
+- 분기 명령
+    (bnez, beq, blt) a0, label
+    label:
+        // instruction
+- Function call
+    li a0, 123
+    jal ra, func //복귀 주소 저장.
+
+    func:
+        addi a0, a0, 1 
+        ret
+    -- 함수 인자는 a0 - a7, 반환 값은 a0에 저장.(통신 규약)
+- Stack
+    -- sp에 최상단 주소가 저장됨.(현재 stack 시작 위치 겸 현재 위치)
+    -- stack은 위에서 아래로 확장.
+
+    addi sp, sp, -4 // stack 확장
+    sw a0, (sp) // sp가 가리키는 위치에 a0 저장
+    lw a0, (s0) // 읽기
+    addi sp, sp, 4 // stack 복원
+
+- CPU 모드 
+    -- M-mode: OpenSBI나 부트로더 관여
+    -- S-mode: 운영체제 모드(kernel 모드)
+    -- U-mode: 일반 애플리케이션 모드
+
+    -- S-mode에서만 실행할 수 있는 Privileged instructions
+    csrr rd, csr	CSR 값을 rd에 읽어옴	
+    csrw csr, rs	rs의 값을 CSR에 씀
+    csrrw rd, csr, rs	CSR 값을 읽고 쓰는 과정을 한 번에 수행
+    sret	트랩 핸들러 복귀(PC, 모드 등 복원)	
+    sfence.vma	TLB(Translation Lookaside Buffer) 초기화
+    CSR(Contral and Status Register)는 CPU 내부 상태ㅇ와 제어를 담당하는 레지스터
+
+- inline assembly
+    __asm__ __volatile__("assembly code"
+        : output operands
+        : input operands
+        : clobbered registers
+    )
+
+    %0, %1, .., 출력 오퍼랜드, 입력 오퍼랜드 순으로 받음.
+    uint32_t value;
+    __asm__ __volatile__("csrr %0, sepc" : "=r"(value));(c출력)
+    __asm__ __volatile__("csrw sscratch, %0" : /* 출력 오퍼랜드는 비어 있음 */ : "r"(123));
