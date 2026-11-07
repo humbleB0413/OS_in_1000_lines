@@ -1,0 +1,9 @@
+커널 패닉은 복구 불가능한 오류를 만났을 때 발생하는 메시지
+
+#define PANIC(fmt, ...)                                                        \
+    do {                                                                       \
+        printf("PANIC: %s:%d: " fmt "\n", __FILE__, __LINE__, ##__VA_ARGS__);  \
+        while (1) {}                                                           \
+    } while (0)
+
+##__VA_ARGS__ 문법 : 매개변수가 가변적인 매크로를 정의할 때 유용한 확장 기능
