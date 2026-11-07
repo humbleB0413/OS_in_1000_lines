@@ -1,0 +1,12 @@
+저자는 C 표준 라이브러리를 사용하지 않고 직접 구현했음.
+
+-paddr_t: 물리 주소
+-vaddr_t: 가상 주소
+-align_up: value를 align의 배수로 맞추어 올림. align은 단 2의 거듭 제곱이어야 함.
+-is_aligned: 배수인지 확인, align은 단 2의 거듭 제곱이어야 함.
+-offsetof: 구조체 내에서 특정 맴버가 시작되는 위치(바이트단위)를 반환.
+
+-memcpy: src > dst로 n byte 복사
+-memset: 시작 위치부터, 바트를 문자 c로 n만큼 채움.
+-strcpy: src의 문자열을 dst로 옮김.
+-strcmp: s1과 s2를 비교함.

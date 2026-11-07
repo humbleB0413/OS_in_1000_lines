@@ -24,6 +24,8 @@ sbiret sbi_call(long arg0, long arg1, long arg2, long arg3, long arg4,
   return (sbiret){.error = a0, .value = a1};
 }
 
+void putchar(char ch) { sbi_call(ch, 0, 0, 0, 0, 0, 0, 1); }
+
 void printf(const char *fmt, ...) {
   va_list vargs;
   va_start(vargs, fmt);
@@ -83,4 +85,40 @@ end:
   va_end(vargs);
 }
 
-void putchar(char ch) { sbi_call(ch, 0, 0, 0, 0, 0, 0, 1); }
+void* memset(void* buf, char c, size_t n){
+    uint8_t* p = (uint8_t*)buf;
+    while(n--){
+        *p++ = c;
+    }
+    return buf;
+}
+
+void* memcpy(void* dst, void* src, size_t n){
+    uint8_t* d = (uint8_t*)dst;
+    const uint8_t* s = (const uint8_t*)src;
+    while(n--){
+        *d++ = *s++;
+    }
+
+    return dst;
+}
+
+void* strcpy(char* dst, const char* src){
+    while(src){
+        *dst++ = *src++;
+    }
+    *dst = '\0';
+    return dst;
+}
+
+int strcmp(const char* s1, const char* s2){
+    while(*s1 && *s2){
+        if(*s1 != *s2){
+            break;
+        }
+        s1++;
+        s2++;
+    }
+
+    return *(unsigned char *)s1 - *(unsigned char *)s2;
+}
