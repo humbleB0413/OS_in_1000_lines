@@ -1,0 +1,28 @@
+- 일반적으로 페이지 할당 방식으로 메모리 할당.
+
+- 링커스크립트 일부
+    . = ALIGN(4);
+    . += 128 * 1024; /* 128KB */
+    __stack_top = .;
+
+    . = ALIGN(4096);
+    __free_ram = .;
+    . += 64 * 1024 * 1024; /* 64MB */
+    __free_ram_end = .;
+
+-- 명시적으로 할당 대상인 메모리 영역 정하기
+
+- 페이지 단위로의 할당
+extern char __free_ram[], __free_ram_end[];
+
+paddr_t alloc_pages(uint32_t n) {
+    static paddr_t next_paddr = (paddr_t) __free_ram;
+    paddr_t paddr = next_paddr;
+    next_paddr += n * PAGE_SIZE;
+
+    if (next_paddr > (paddr_t) __free_ram_end)
+        PANIC("out of memory");
+
+    memset((void *) paddr, 0, n * PAGE_SIZE);
+    return paddr;
+}
