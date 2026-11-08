@@ -8,7 +8,6 @@
         while (1) {}                                                           \
     } while (0)
 
-
 void printf(const char *fmt, ...);
 
 typedef struct{
@@ -59,3 +58,14 @@ typedef struct{
         uint32_t __tmp = (value);                                              \
         __asm__ __volatile__("csrw " #reg ", %0" ::"r"(__tmp));                \
     } while (0)
+
+#define PROCESS_MAX 8
+#define PROC_UNUSED 0
+#define PROC_RUNNABLE 1
+
+typedef struct{
+    uint32_t pid;
+    uint32_t state;
+    vaddr_t sp;
+    uint8_t stack[8192];
+} process_t;
