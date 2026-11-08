@@ -34,7 +34,7 @@ RISC-V 어셈블리 입문
 
     addi sp, sp, -4 // stack 확장
     sw a0, (sp) // sp가 가리키는 위치에 a0 저장
-    lw a0, (s0) // 읽기
+    lw a0, (sp) // 읽기
     addi sp, sp, 4 // stack 복원
 
 - CPU 모드 
