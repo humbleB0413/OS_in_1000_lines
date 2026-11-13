@@ -1,20 +1,27 @@
 #!/bin/bash
-set -xue
+set -xue    # 실행하는 명령을 출력하고, 실패하면 즉시 중단
 
-# GNU RISC-V 크로스 툴체인 (설치된 prefix에 맞게 수정)
-PREFIX=riscv64-unknown-elf-
-CC=${PREFIX}gcc
-OBJCOPY=${PREFIX}objcopy
+# 툴체인 (GCC riscv64로 32비트 빌드)
+CC=riscv64-unknown-elf-gcc
+OBJCOPY=riscv64-unknown-elf-objcopy
+QEMU=qemu-system-riscv32
 
 CFLAGS="-std=c11 -O2 -g3 -Wall -Wextra \
-  -march=rv32imac_zicsr_zifencei -mabi=ilp32 \
-  -fno-stack-protector -ffreestanding -nostdlib -fno-builtin" 
+        -march=rv32imac_zicsr -mabi=ilp32 \
+        -ffreestanding -nostdlib -fno-stack-protector \
+        -Wl,--no-warn-rwx-segments"
+
+# 이전 빌드 산출물 정리
+rm -f shell.elf shell.bin shell.bin.o kernel.elf
 
 # Build the shell (application)
-$CC $CFLAGS -Wl,-Tuser.ld -Wl,-Map=shell.map -o shell.elf shell.c user.c common.c -lgcc
+$CC $CFLAGS -Wl,-Tuser.ld -Wl,-Map=shell.map -o shell.elf shell.c user.c common.c
 $OBJCOPY --set-section-flags .bss=alloc,contents -O binary shell.elf shell.bin
-$OBJCOPY -I binary -O elf32-littleriscv -B riscv shell.bin shell.bin.o
+$OBJCOPY -Ibinary -Oelf32-littleriscv shell.bin shell.bin.o
 
 # Build the kernel
 $CC $CFLAGS -Wl,-Tkernel.ld -Wl,-Map=kernel.map -o kernel.elf \
-    kernel.c common.c shell.bin.o -lgcc
+    kernel.c common.c shell.bin.o
+
+$QEMU -machine virt -bios default -nographic -serial mon:stdio --no-reboot \
+    -kernel kernel.elf
